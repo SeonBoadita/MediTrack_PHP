@@ -2,6 +2,29 @@
 <?php
 include ('connection/database.php');
 session_start();
+try {
+    if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+        $name = filter_input(INPUT_POST, 'name', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+        $age = filter_input(INPUT_POST, 'age', FILTER_SANITIZE_NUMBER_INT);
+        $gender = $_POST['gender'];
+        $disease = filter_input(INPUT_POST, 'disease', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+        $contact = filter_input(INPUT_POST, 'contact', FILTER_SANITIZE_NUMBER_INT);
+        $doctor_id = filter_input(INPUT_POST, 'doctor', FILTER_SANITIZE_NUMBER_INT);
+
+
+
+        $sql = "INSERT INTO user_register (user_name, user_age, user_gender, user_disease, user_contact, doctor_id) VALUES ('$name', '$age', '$gender', '$disease', '$contact', '$doctor_id')";
+
+        $res = mysqli_query($conn, $sql);
+
+        if ($res) {
+            header("Location: home.php");
+            exit();
+        }
+    }
+} catch (\Throwable $th) {
+    die('ERROR IN REGISTERATION: ' . $th);
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -30,7 +53,7 @@ session_start();
             <p class="text-sm text-gray-500 mt-1">Fill in your details to register</p>
         </div>
 
-        <form action="home.php" method="POST" class="space-y-5">
+        <form action="<?=$_SERVER['PHP_SELF']?>" method="POST" class="space-y-5">
 
             <!-- Full Name -->
             <div>
@@ -92,7 +115,7 @@ session_start();
                             $res = mysqli_query($conn, $sql);
                             if (mysqli_num_rows($res) > 0) {
                                 while ($row = mysqli_fetch_assoc($res)) {
-                                    echo "<option value='" . htmlspecialchars($row['name']) . "' id='" . htmlspecialchars($row['doctorID']) . "' >"
+                                    echo "<option value='" . htmlspecialchars($row['doctorID']) . "'>"
                                         . htmlspecialchars($row['name']) . ' - '
                                         . htmlspecialchars($row['designation'])
                                         . '</option>';

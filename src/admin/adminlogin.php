@@ -12,17 +12,17 @@ try {
         $sql = "SELECT * FROM doctorsignup WHERE TRIM(email) = '$email'";
         $res = mysqli_query($conn, $sql);
         if (mysqli_num_rows($res) > 0) {
-            $user = mysqli_fetch_assoc($res);
-            if (password_verify($password, $user['password'])) {
-                $_SESSION['admin_id'] = mysqli_insert_id($conn);
-                $_SESSION['admin_name'] = $user['name'];
+            $admin = mysqli_fetch_assoc($res);
+            if (password_verify($password, $admin['password'])) {
+                $_SESSION['admin_id'] = $admin['doctorID'];
+                $_SESSION['admin_name'] = $admin['name'];
                 header('Location: admin.php');
                 exit();
             } else {
                 $error = 'Please check your password.';
             }
         } else {
-            $error = 'No user found.';
+            $error = 'No admin found.';
         }
     }
 } catch (\Throwable $th) {

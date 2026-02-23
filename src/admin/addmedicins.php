@@ -1,3 +1,18 @@
+<?php
+session_start();
+include ('../connection/database.php');
+try {
+    if (isset($_GET['id'])) {
+        $patient_id = filter_input(INPUT_GET, 'id', FILTER_SANITIZE_NUMBER_INT);
+        $dummy_id = filter_input(INPUT_GET, 'uid', FILTER_SANITIZE_NUMBER_INT);
+        // echo"id: " .$_GET['id'] . "pid: " . $patient_id;
+
+        $sql = "SELECT * FROM `user_register` WHERE id =$patient_id";
+        $res = mysqli_query($conn, $sql);
+
+        if (mysqli_num_rows($res) > 0) {
+            $row = mysqli_fetch_assoc($res);
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -13,7 +28,7 @@
     <nav class="bg-white shadow">
         <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
             <a href="admin.php" class="text-2xl font-bold text-indigo-600">MediTrack <span
-                    class="text-sm font-normal text-gray-400">Admin &rsaquo; Patient Medicines</span></a>
+                    class="text-sm font-normal text-gray-400">Admin &rsaquo; <?= $row['user_name'] ?></span></a>
             <div class="flex gap-4 text-sm">
                 <a href="admin.php" class="text-gray-500 hover:text-indigo-600 transition">&larr; Back to Dashboard</a>
             </div>
@@ -29,8 +44,8 @@
                     class="w-14 h-14 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 text-2xl font-bold">
                     JD</div>
                 <div>
-                    <h1 class="text-2xl font-bold text-gray-800">John Doe</h1>
-                    <p class="text-sm text-gray-500">Patient ID: P001 &bull; Age: 34 &bull; Diagnosis: Flu</p>
+                    <h1 class="text-2xl font-bold text-gray-800"><?= $row['user_name'] ?></h1>
+                    <p class="text-sm text-gray-500">Patient ID: P<?= $dummy_id ?> &bull; Age:  <?= $row['user_age'] ?> &bull; Diagnosis: <?= $row['user_disease'] ?></p>
                 </div>
             </div>
         </div>
@@ -136,5 +151,12 @@
         </div>
     </main>
 </body>
+<?php
+        }
+    }
+} catch (\Throwable $th) {
+    die('ERROR IN ADD MEDICINS PAGE: ' . $th);
+}
 
+?>
 </html>

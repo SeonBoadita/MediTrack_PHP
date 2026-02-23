@@ -1,5 +1,12 @@
 <?php
-
+session_start();
+include ('../connection/database.php');
+$admin_id = $_SESSION['admin_id'];
+$admin_name = $_SESSION['admin_name'];
+if (empty($admin_id)) {
+    header('Location: adminlogin.php');
+    exit();
+}
 ?>
 
 <!DOCTYPE html>
@@ -17,7 +24,7 @@
     <nav class="bg-white shadow">
         <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
             <a href="admin.php" class="text-2xl font-bold text-indigo-600">MediTrack <span
-                    class="text-sm font-normal text-gray-400">Admin</span></a>
+                    class="text-sm font-normal text-gray-400"><?= $admin_name ?></span></a>
             <div class="flex gap-4 text-sm">
                 <a href="admin.php"
                     class="text-indigo-600 font-semibold border-b-2 border-indigo-600 pb-1">Dashboard</a>
@@ -70,83 +77,53 @@
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100">
-                        <!-- Patient 1 -->
-                        <tr class="hover:bg-indigo-50 transition">
-                            <td class="py-4 px-5 text-gray-600 font-mono">P001</td>
-                            <td class="py-4 px-5 font-medium text-gray-800">John Doe</td>
-                            <td class="py-4 px-5 text-gray-600">34</td>
-                            <td class="py-4 px-5 text-gray-600">Male</td>
-                            <td class="py-4 px-5">
-                                <span class="bg-blue-100 text-blue-700 text-xs font-semibold px-3 py-1 rounded-full">Flu</span>
-                            </td>
-                            <td class="py-4 px-5 text-gray-600">555-1234</td>
-                            <td class="py-4 px-5">
-                                <div class="flex items-center justify-center gap-2">
-                                    <a href="addmedicins.php" class="bg-indigo-500 text-white text-xs px-3 py-1.5 rounded-lg hover:bg-indigo-600 transition">View Medicines</a>
-                                    <form method="post" action="#">
-                                        <button type="submit" class="bg-red-500 text-white text-xs px-3 py-1.5 rounded-lg hover:bg-red-600 transition">Delete</button>
-                                    </form>
-                                </div>
-                            </td>
-                        </tr>
-                        <!-- Patient 2 -->
-                        <tr class="hover:bg-indigo-50 transition">
-                            <td class="py-4 px-5 text-gray-600 font-mono">P002</td>
-                            <td class="py-4 px-5 font-medium text-gray-800">Jane Smith</td>
-                            <td class="py-4 px-5 text-gray-600">28</td>
-                            <td class="py-4 px-5 text-gray-600">Female</td>
-                            <td class="py-4 px-5">
-                                <span class="bg-purple-100 text-purple-700 text-xs font-semibold px-3 py-1 rounded-full">Allergy</span>
-                            </td>
-                            <td class="py-4 px-5 text-gray-600">555-5678</td>
-                            <td class="py-4 px-5">
-                                <div class="flex items-center justify-center gap-2">
-                                    <a href="addmedicins.php" class="bg-indigo-500 text-white text-xs px-3 py-1.5 rounded-lg hover:bg-indigo-600 transition">View Medicines</a>
-                                    <form method="post" action="#">
-                                        <button type="submit" class="bg-red-500 text-white text-xs px-3 py-1.5 rounded-lg hover:bg-red-600 transition">Delete</button>
-                                    </form>
-                                </div>
-                            </td>
-                        </tr>
-                        <!-- Patient 3 -->
-                        <tr class="hover:bg-indigo-50 transition">
-                            <td class="py-4 px-5 text-gray-600 font-mono">P003</td>
-                            <td class="py-4 px-5 font-medium text-gray-800">Michael Lee</td>
-                            <td class="py-4 px-5 text-gray-600">45</td>
-                            <td class="py-4 px-5 text-gray-600">Male</td>
-                            <td class="py-4 px-5">
-                                <span class="bg-orange-100 text-orange-700 text-xs font-semibold px-3 py-1 rounded-full">Diabetes</span>
-                            </td>
-                            <td class="py-4 px-5 text-gray-600">555-8765</td>
-                            <td class="py-4 px-5">
-                                <div class="flex items-center justify-center gap-2">
-                                    <a href="addmedicins.php" class="bg-indigo-500 text-white text-xs px-3 py-1.5 rounded-lg hover:bg-indigo-600 transition">View Medicines</a>
-                                    <form method="post" action="#">
-                                        <button type="submit" class="bg-red-500 text-white text-xs px-3 py-1.5 rounded-lg hover:bg-red-600 transition">Delete</button>
-                                    </form>
-                                </div>
-                            </td>
-                        </tr>
-                        <!-- Patient 4 -->
-                        <tr class="hover:bg-indigo-50 transition">
-                            <td class="py-4 px-5 text-gray-600 font-mono">P004</td>
-                            <td class="py-4 px-5 font-medium text-gray-800">Emily Clark</td>
-                            <td class="py-4 px-5 text-gray-600">52</td>
-                            <td class="py-4 px-5 text-gray-600">Female</td>
-                            <td class="py-4 px-5">
-                                <span
-                                    class="bg-red-100 text-red-700 text-xs font-semibold px-3 py-1 rounded-full">Hypertension</span>
-                            </td>
-                            <td class="py-4 px-5 text-gray-600">555-4321</td>
-                            <td class="py-4 px-5">
-                                <div class="flex items-center justify-center gap-2">
-                                    <a href="addmedicins.php" class="bg-indigo-500 text-white text-xs px-3 py-1.5 rounded-lg hover:bg-indigo-600 transition">View Medicines</a>
-                                    <form method="post" action="#">
-                                        <button type="submit" class="bg-red-500 text-white text-xs px-3 py-1.5 rounded-lg hover:bg-red-600 transition">Delete</button>
-                                    </form>
-                                </div>
-                            </td>
-                        </tr>
+                        <?php
+                        try { 
+                            $sql = "SELECT * FROM user_register WHERE doctor_id = '$admin_id'";
+                            $res = mysqli_query($conn, $sql);
+
+                            if (mysqli_num_rows($res) > 0) {
+                                $id = 0;
+                                while ($row = mysqli_fetch_assoc($res)) {
+                                    $id += 1;
+                                    ?>
+                                    
+                                    <tr class="hover:bg-indigo-50 transition">
+                                        <td class="py-4 px-5 text-gray-600 font-mono">P<?= $id ?></td>
+                                        <td class="py-4 px-5 font-medium text-gray-800"><?= htmlspecialchars($row['user_name']) ?></td>
+                                        <td class="py-4 px-5 text-gray-600"><?= htmlspecialchars($row['user_age']) ?></td>
+                                        <td class="py-4 px-5 text-gray-600"><?= htmlspecialchars($row['user_gender']) ?></td>
+                                        <td class="py-4 px-5">
+                                            <span class="bg-blue-100 text-blue-700 text-xs font-semibold px-3 py-1 rounded-full">
+                                                <?= htmlspecialchars($row['user_disease']) ?>
+                                            </span>
+                                        </td>
+                                        <td class="py-4 px-5 text-gray-600"><?= htmlspecialchars($row['user_contact']) ?></td>
+                                        <td class="py-4 px-5">
+                                            <div class="flex items-center justify-center gap-2">
+                                                <a href="addmedicins.php?id=<?= $row['id'] ?>&uid=<?=$id?>" class="bg-indigo-500 text-white text-xs px-3 py-1.5 rounded-lg hover:bg-indigo-600 transition">View Medicines</a>
+                                                
+                                                <form method="post" action="delete_patient.php">
+                                                    <input type="hidden" name="delete_id" value="<?= $row['id'] ?>">
+                                                    <button type="submit" class="bg-red-500 text-white text-xs px-3 py-1.5 rounded-lg hover:bg-red-600 transition" onclick="return confirm('Are you sure you want to delete this patient?');">Delete</button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    
+                                    <?php
+                                }
+                            } else {
+                                ?>
+                                <tr>
+                                    <td colspan="7" class="py-8 text-center text-gray-500 font-medium">No patients registered yet.</td>
+                                </tr>
+                                <?php
+                            }
+                        } catch (\Throwable $th) {
+                            die("ERROR IN ADMIN PAGE: " . $th->getMessage());
+                        }
+                        ?>
                     </tbody>
                 </table>
             </div>
