@@ -12,6 +12,12 @@ try {
 
         if (mysqli_num_rows($res) > 0) {
             $row = mysqli_fetch_assoc($res);
+            $arr = array_slice(preg_split('/\s+/', trim($row['user_name'])), 0, 2);
+            $initials = "";
+            foreach ($arr as $word) {
+                $initials .= strtoupper($word[0]);
+                }
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -42,7 +48,7 @@ try {
             <div class="flex items-center gap-4">
                 <div
                     class="w-14 h-14 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 text-2xl font-bold">
-                    JD</div>
+                    <?=$initials?></div>
                 <div>
                     <h1 class="text-2xl font-bold text-gray-800"><?= $row['user_name'] ?></h1>
                     <p class="text-sm text-gray-500">Patient ID: P<?= $dummy_id ?> &bull; Age:  <?= $row['user_age'] ?> &bull; Diagnosis: <?= $row['user_disease'] ?></p>

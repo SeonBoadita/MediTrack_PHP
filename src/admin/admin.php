@@ -105,7 +105,6 @@ if (empty($admin_id)) {
                                                 
                                                 <form method="post" action="delete_patient.php">
                                                     <input type="hidden" name="delete_id" value="<?= $row['id'] ?>">
-                                                    <button type="submit" class="bg-red-500 text-white text-xs px-3 py-1.5 rounded-lg hover:bg-red-600 transition" onclick="return confirm('Are you sure you want to delete this patient?');">Delete</button>
                                                 </form>
                                             </div>
                                         </td>
