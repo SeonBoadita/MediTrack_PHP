@@ -10,10 +10,11 @@ try {
         $disease = filter_input(INPUT_POST, 'disease', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
         $contact = filter_input(INPUT_POST, 'contact', FILTER_SANITIZE_NUMBER_INT);
         $doctor_id = filter_input(INPUT_POST, 'doctor', FILTER_SANITIZE_NUMBER_INT);
+        $user_id = $_SESSION['user_id'];
+        $display_date = date('F j, Y');
 
 
-
-        $sql = "INSERT INTO user_register (user_name, user_age, user_gender, user_disease, user_contact, doctor_id) VALUES ('$name', '$age', '$gender', '$disease', '$contact', '$doctor_id')";
+        $sql = "INSERT INTO user_register (user_name, user_age, user_gender, user_disease, user_contact, reg_date, doctor_id, user_id) VALUES ('$name', '$age', '$gender', '$disease', '$contact', '$display_date', '$doctor_id', $user_id)";
 
         $res = mysqli_query($conn, $sql);
 

@@ -3,11 +3,14 @@ include ('connection/database.php');
 
 session_start();
 
-    if (!isset($_SESSION['user_id'])) {
-        header('Location: index.php');
-        exit();
-    }
-
+if (!isset($_SESSION['user_id'])) {
+    header('Location: index.php');
+    exit();
+}
+try {
+$user_id = $_SESSION['user_id'];
+$sqlget = "SELECT * FROM user_register WHERE user_id = '$user_id'";
+$res = mysqli_query($conn, $sqlget);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -93,6 +96,57 @@ session_start();
             </a>
         </div>
 
+        <!-- My Doctors Section -->
+        <div class="mt-10">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                <?php
+                if ($res && mysqli_num_rows($res) > 0) {
+                    while ($row = mysqli_fetch_assoc($res)) {
+                        $doctor_id = $row['doctor_id'];
+
+                        $sqldoc = "SELECT * FROM doctorsignup WHERE doctorID = '$doctor_id'";
+                        $resdoc = mysqli_query($conn, $sqldoc);
+                        
+                        if ($resdoc && mysqli_num_rows($resdoc) > 0) {
+                            while ($rowdoc = mysqli_fetch_assoc($resdoc)) {
+                ?>
+                
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 flex flex-col gap-4 hover:shadow-md transition">
+                    <div class="flex items-center gap-4">
+                        <div class="w-14 h-14 rounded-full bg-blue-100 flex items-center justify-center shrink-0">
+                            <svg class="w-7 h-7 text-blue-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="font-semibold text-gray-800"><?= htmlspecialchars($rowdoc['name']) ?></p>
+                            <p class="text-xs text-blue-500 font-medium mt-0.5"><?= htmlspecialchars($rowdoc['designation']) ?></p>
+                        </div>
+                    </div>
+                    <div class="text-xs text-gray-500 space-y-1">
+                        <div class="flex items-center gap-2">
+                            <svg class="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0H5m14 0h2m-2 0h-2M9 7h6M9 11h6M9 15h4" /></svg>
+                            
+                            Diagnosis: <?= htmlspecialchars($row['user_disease']) ?> 
+
+                        </div>
+                    </div>
+                </div>
+                
+                <?php
+                            }
+                        }
+                    }
+                }
+                ?>
+                <!-- Empty State Card -->
+                <div class="bg-white rounded-2xl shadow-sm border border-dashed border-gray-200 p-5 flex flex-col items-center justify-center gap-3 text-center min-h-40 hover:border-blue-300 transition">
+                    <a href="doctorselect.php" class="text-[14px] text-blue-500 hover:text-blue-600 font-semibold transition">Browse Doctors &rarr;</a>
+                </div>
+
+            </div>
+        </div>
+
         <!-- Info Strip -->
         <div class="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
             <div class="bg-white rounded-xl p-5 shadow-sm">
@@ -120,5 +174,9 @@ session_start();
     </footer>
 
 </body>
-
+<?php
+} catch (\Throwable $th) {
+    throw $th;
+}
+?>
 </html>

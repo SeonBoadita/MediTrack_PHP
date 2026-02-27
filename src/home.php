@@ -12,9 +12,11 @@ try {
     $userid = $_SESSION['user_id'];
     $name = $_SESSION['name'];
 
-} catch (\Throwable $th) {
-    die('ERROR IN HOMEPAGE: ' . $th);
-}
+
+
+    $sql = "SELECT * FROM reg_medicins WHERE user_id = '$userid'";
+    $result = mysqli_query($conn, $sql);
+
 ?>
 
 
@@ -72,60 +74,33 @@ try {
                             <th class="py-3 px-5 text-left font-semibold">Status</th>
                         </tr>
                     </thead>
+                    <?php 
+                    if(mysqli_num_rows($result)){
+                        while($row = mysqli_fetch_assoc($result)){
+                            $med_name = $row['med_name'];
+                            $dose = $row['dose'];
+                            $schedule = $row['schedule'];
+                            $med_taken = $row['med_taken'];
+                    ?>
                     <tbody class="divide-y divide-gray-100">
                         <tr class="hover:bg-indigo-50 transition">
                             <td class="py-4 px-5 text-center">
-                                <input type="checkbox" name="taken[]" value="1" checked
+                                <input type="checkbox" name="taken[]" value="<?=$med_taken?>" checked
                                     class="w-5 h-5 rounded border-gray-300 text-indigo-600 cursor-pointer">
                             </td>
-                            <td class="py-4 px-5 font-medium text-gray-800">Paracetamol</td>
-                            <td class="py-4 px-5 text-gray-600">500mg</td>
-                            <td class="py-4 px-5 text-gray-600">08:00 AM</td>
+                            <td class="py-4 px-5 font-medium text-gray-800"><?=$med_name?></td>
+                            <td class="py-4 px-5 text-gray-600"><?=$dose?></td>
+                            <td class="py-4 px-5 text-gray-600"><?=$schedule?></td>
                             <td class="py-4 px-5">
                                 <span
                                     class="inline-block bg-green-100 text-green-700 text-xs font-semibold px-3 py-1 rounded-full">Taken</span>
-                            </td>
-                        </tr>
-                        <tr class="hover:bg-indigo-50 transition">
-                            <td class="py-4 px-5 text-center">
-                                <input type="checkbox" name="taken[]" value="2" checked
-                                    class="w-5 h-5 rounded border-gray-300 text-indigo-600 cursor-pointer">
-                            </td>
-                            <td class="py-4 px-5 font-medium text-gray-800">Ibuprofen</td>
-                            <td class="py-4 px-5 text-gray-600">200mg</td>
-                            <td class="py-4 px-5 text-gray-600">12:00 PM</td>
-                            <td class="py-4 px-5">
-                                <span
-                                    class="inline-block bg-green-100 text-green-700 text-xs font-semibold px-3 py-1 rounded-full">Taken</span>
-                            </td>
-                        </tr>
-                        <tr class="hover:bg-indigo-50 transition">
-                            <td class="py-4 px-5 text-center">
-                                <input type="checkbox" name="taken[]" value="3"
-                                    class="w-5 h-5 rounded border-gray-300 text-indigo-600 cursor-pointer">
-                            </td>
-                            <td class="py-4 px-5 font-medium text-gray-800">Amoxicillin</td>
-                            <td class="py-4 px-5 text-gray-600">250mg</td>
-                            <td class="py-4 px-5 text-gray-600">06:00 PM</td>
-                            <td class="py-4 px-5">
-                                <span
-                                    class="inline-block bg-yellow-100 text-yellow-700 text-xs font-semibold px-3 py-1 rounded-full">Pending</span>
-                            </td>
-                        </tr>
-                        <tr class="hover:bg-indigo-50 transition">
-                            <td class="py-4 px-5 text-center">
-                                <input type="checkbox" name="taken[]" value="4"
-                                    class="w-5 h-5 rounded border-gray-300 text-indigo-600 cursor-pointer">
-                            </td>
-                            <td class="py-4 px-5 font-medium text-gray-800">Cetirizine</td>
-                            <td class="py-4 px-5 text-gray-600">10mg</td>
-                            <td class="py-4 px-5 text-gray-600">09:00 PM</td>
-                            <td class="py-4 px-5">
-                                <span
-                                    class="inline-block bg-yellow-100 text-yellow-700 text-xs font-semibold px-3 py-1 rounded-full">Pending</span>
                             </td>
                         </tr>
                     </tbody>
+                    <?php
+                        }
+                    }
+                    ?>
                 </table>
                 <div class="px-6 py-4 bg-gray-50 border-t border-gray-100 flex justify-end">
                     <button type="submit"
@@ -149,5 +124,9 @@ try {
         </div>
     </main>
 </body>
-
+<?php
+} catch (\Throwable $th) {
+    die('ERROR IN HOMEPAGE: ' . $th);
+}
+?>
 </html>

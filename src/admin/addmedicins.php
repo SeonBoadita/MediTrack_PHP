@@ -9,6 +9,28 @@ try {
     $patient_id = (int) filter_input(INPUT_GET, 'id', FILTER_SANITIZE_NUMBER_INT);
     $dummy_id = (int) filter_input(INPUT_GET, 'uid', FILTER_SANITIZE_NUMBER_INT);
 
+    if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['delete_med'])) {
+        $id = (int) $_POST['id'];
+        $sqldelete = "DELETE FROM reg_medicins WHERE id ='$id'";
+        mysqli_query($conn, $sqldelete);
+        header("Location: addmedicins.php?id=$patient_id&uid=$dummy_id");
+        exit();
+    }
+            
+    if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_med'])) {
+
+        $med_id = (int) $_POST['med_id']; 
+        
+        $new_med_name = filter_input(INPUT_POST, 'medicine', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+        $new_dosage = filter_input(INPUT_POST, 'dosage', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+        $new_schedule = filter_input(INPUT_POST, 'schedule', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+
+        $sql = "UPDATE reg_medicins SET med_name = '$new_med_name', dose = '$new_dosage', schedule = '$new_schedule' WHERE id = '$med_id'";
+        mysqli_query($conn, $sql);
+        
+        header("Location: addmedicins.php?id=$patient_id&uid=$dummy_id");
+        exit();
+    }
     
     if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_medicine'])) {
         $med_name = filter_input(INPUT_POST, 'medicine', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
@@ -19,7 +41,7 @@ try {
 
         $dummy_id = (int) filter_input(INPUT_GET, 'uid', FILTER_SANITIZE_NUMBER_INT);
 
-        $sql = "INSERT INTO reg_medicins (med_name, dose, schedule, user_id, doctor_id) VALUES ('$med_name', '$dosage', '$schedule', '$patient_id', '$doctor_id')";
+        $sql = "INSERT INTO reg_medicins (med_name, dose, schedule, med_taken, user_id, doctor_id) VALUES ('$med_name', '$dosage', '$schedule', 0, '$patient_id', '$doctor_id')";
 
         $res = mysqli_query($conn, $sql);
         header("Location: addmedicins.php?id=$patient_id&uid=$dummy_id");
@@ -89,7 +111,7 @@ try {
             <!-- Medicine -->
 
             <?php
-            $sqlfetch = 'SELECT * FROM reg_medicins';
+            $sqlfetch = "SELECT * FROM reg_medicins WHERE user_id = '$patient_id'";
             $resfetch = mysqli_query($conn, $sqlfetch);
             if (mysqli_num_rows($resfetch)) {
                 while ($row = mysqli_fetch_assoc($resfetch)) {
@@ -103,22 +125,27 @@ try {
                     <p class="font-semibold text-gray-800"><?= $med_name ?></p>
                     <p class="text-xs text-gray-500"><?= $dose ?> &bull; <?= $schedule ?></p>
                 </div>
-                <form method="post" action="#" class="flex items-center gap-2">
+
+
+                <form method="post" action="addmedicins.php?id=<?= $patient_id ?>&uid=<?= $dummy_id ?>" class="flex items-center gap-2">
+                    
+                    <input type="hidden" name="med_id" value="<?= $row['id'] ?>">
+                    
                     <input type="text" name="medicine" value="<?= $med_name ?>"
-                        class="border border-gray-300 rounded-lg px-3 py-2 text-sm w-32 focus:ring-2 focus:ring-indigo-300 focus:border-indigo-400 outline-none"
-                        required>
+                        class="border border-gray-300 rounded-lg px-3 py-2 text-sm w-32 focus:ring-2 focus:ring-indigo-300 focus:border-indigo-400 outline-none" required>
                     <input type="text" name="dosage" value="<?= $dose ?>"
-                        class="border border-gray-300 rounded-lg px-3 py-2 text-sm w-24 focus:ring-2 focus:ring-indigo-300 focus:border-indigo-400 outline-none"
-                        required>
+                        class="border border-gray-300 rounded-lg px-3 py-2 text-sm w-24 focus:ring-2 focus:ring-indigo-300 focus:border-indigo-400 outline-none" required>
                     <input type="text" name="schedule" value="<?= $schedule ?>"
-                        class="border border-gray-300 rounded-lg px-3 py-2 text-sm w-28 focus:ring-2 focus:ring-indigo-300 focus:border-indigo-400 outline-none"
-                        required>
-                    <button type="submit"
+                        class="border border-gray-300 rounded-lg px-3 py-2 text-sm w-28 focus:ring-2 focus:ring-indigo-300 focus:border-indigo-400 outline-none" required>
+                    
+                    <button type="submit" name="update_med"
                         class="bg-amber-500 text-white text-sm px-4 py-2 rounded-lg hover:bg-amber-600 transition font-medium">Update</button>
                 </form>
-                <form method="post" action="#">
-                    <button type="submit"
-                        class="bg-red-500 text-white text-sm px-4 py-2 rounded-lg hover:bg-red-600 transition font-medium">Delete</button>
+                <form method="post" action="addmedicins.php?id=<?= $patient_id ?>&uid=<?= $dummy_id ?>">
+                    <input type="hidden" name="id" value="<?= $row['id'] ?>">
+                    <button type="submit" name="delete_med"
+                        class="bg-red-500 text-white text-sm px-4 py-2 rounded-lg hover:bg-red-600 transition font-medium"
+                        onclick="return confirm('Are you sure you want to delete this medicine?');">Delete</button>
                 </form>
             </div>
             <?php
