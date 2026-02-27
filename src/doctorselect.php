@@ -6,9 +6,11 @@ $current_user_id = $_SESSION['user_id'];
 $name = $_SESSION['name'];
 
 try {
-    $sql = "SELECT d.doctorID, d.name, d.designation FROM doctorsignup d JOIN user_register ur ON d.doctorID = ur.doctor_id WHERE ur.user_id = '$current_user_id'";
+    $sql = "SELECT d.doctorID, d.name, d.designation, ur.id, ur.doctor_id 
+            FROM doctorsignup d 
+            JOIN user_register ur ON d.doctorID = ur.doctor_id 
+            WHERE ur.user_id = '$current_user_id'";
     $res = mysqli_query($conn, $sql);
-
     ?>
 
 <!DOCTYPE html>
@@ -100,7 +102,7 @@ try {
                     </div>
                 </div>
                 <div class="px-6 pb-5 flex gap-2">
-                    <a href="viewmeds.php?doc=1"
+                    <a href="home.php?reg_id=<?=$row['id']?>&dr_id=<?=$row['doctor_id']?>"
                         class="flex-1 text-center bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium py-2 rounded-lg transition">
                         View Meds
                     </a>
@@ -111,18 +113,11 @@ try {
                 </div>
             </div>
             <?php
-                            }
+                }
             }
             ?>
 
         </div>
-
-        <!-- Empty State (hidden when cards are shown) -->
-        <!-- <div class="text-center py-20 text-gray-400">
-            <div class="text-6xl mb-4">&#128680;</div>
-            <p class="text-lg font-medium">No doctors registered yet.</p>
-            <a href="register.php" class="mt-4 inline-block text-indigo-600 hover:underline text-sm">Register your first doctor &rarr;</a>
-        </div> -->
 
     </main>
 
