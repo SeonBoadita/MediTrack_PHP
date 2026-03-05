@@ -2,15 +2,23 @@
 include ('connection/database.php');
 
 session_start();
+
+if (!isset($_SESSION['user_id'])) {
+    header('Location: index.php');
+    exit();
+}
+
 $current_user_id = $_SESSION['user_id'];
 $name = $_SESSION['name'];
 
 try {
-    $sql = "SELECT d.doctorID, d.name, d.designation, ur.id, ur.doctor_id 
-            FROM doctorsignup d 
-            JOIN user_register ur ON d.doctorID = ur.doctor_id 
+    $sql = "SELECT d.doctorID, d.name, d.designation, ur.id, ur.doctor_id, ur.reg_date,
+                   (SELECT COUNT(*) FROM reg_medicins rm WHERE rm.user_id = ur.id AND rm.doctor_id = ur.doctor_id) AS med_count
+            FROM doctorsignup d
+            JOIN user_register ur ON d.doctorID = ur.doctor_id
             WHERE ur.user_id = '$current_user_id'";
     $res = mysqli_query($conn, $sql);
+    $doctor_count = mysqli_num_rows($res);
     ?>
 
 <!DOCTYPE html>
@@ -34,8 +42,8 @@ try {
             <div class="flex items-center gap-4">
                 <span class="text-sm text-gray-500 hidden sm:block">Welcome, <span
                         class="font-semibold text-gray-700"><?= htmlspecialchars($name) ?></span></span>
-                <a href="home.php" class="text-sm text-gray-500 hover:text-indigo-600 transition">&larr; Dashboard</a>
-                <a href="index.php"
+                <a href="dashboard.php" class="text-sm text-gray-500 hover:text-indigo-600 transition">&larr; Dashboard</a>
+                <a href="logout.php"
                     class="text-sm bg-red-100 text-red-500 hover:bg-red-200 px-3 py-1.5 rounded-lg transition font-medium">Logout</a>
             </div>
         </div>
@@ -59,7 +67,7 @@ try {
         <div class="flex items-center justify-between mb-6">
             <div>
                 <h2 class="text-xl font-bold text-gray-800">Your Registered Doctors</h2>
-                <p class="text-sm text-gray-500 mt-0.5">3 doctors found</p>
+                <p class="text-sm text-gray-500 mt-0.5"><?= $doctor_count ?> doctor<?= $doctor_count !== 1 ? 's' : '' ?> found</p>
             </div>
             <a href="register.php"
                 class="bg-indigo-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-indigo-700 transition font-semibold shadow">
@@ -73,32 +81,31 @@ try {
             <!-- Card -->
             <?php
             if (mysqli_num_rows($res) > 0) {
+                mysqli_data_seek($res, 0);
                 while ($row = mysqli_fetch_assoc($res)) {
-
+                    $doc_words = array_slice(preg_split('/\s+/', trim($row['name'])), 0, 2);
+                    $doc_initials = '';
+                    foreach ($doc_words as $w) { $doc_initials .= strtoupper($w[0]); }
             ?>
             <div class="bg-white rounded-2xl shadow-md hover:shadow-lg transition overflow-hidden flex flex-col">
                 <div class="bg-indigo-50 px-6 py-5 flex items-center gap-4">
                     <div
                         class="w-12 h-12 rounded-full bg-indigo-600 flex items-center justify-center text-white text-lg font-bold flex-shrink-0">
-                        AS
+                        <?= htmlspecialchars($doc_initials) ?>
                     </div>
                     <div class="min-w-0">
-                        <h3 class="font-semibold text-gray-800 truncate">Dr. <?=$row['name']?></h3>
-                        <p class="text-xs text-indigo-500 font-medium">Cardiologist</p>
+                        <h3 class="font-semibold text-gray-800 truncate">Dr. <?= htmlspecialchars($row['name']) ?></h3>
+                        <p class="text-xs text-indigo-500 font-medium"><?= htmlspecialchars($row['designation']) ?></p>
                     </div>
                 </div>
                 <div class="px-6 py-4 flex-1 space-y-2 text-sm text-gray-600">
                     <div class="flex items-center gap-2">
                         <span class="text-gray-400">&#128197;</span>
-                        <span>Registered: <span class="font-medium text-gray-700">Jan 10, 2026</span></span>
+                        <span>Registered: <span class="font-medium text-gray-700"><?= htmlspecialchars($row['reg_date']) ?></span></span>
                     </div>
                     <div class="flex items-center gap-2">
                         <span class="text-gray-400">&#128138;</span>
-                        <span>Medicines: <span class="font-semibold text-indigo-600">3 active</span></span>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <span class="text-gray-400">&#128205;</span>
-                        <span>Cairo General Hospital</span>
+                        <span>Medicines: <span class="font-semibold text-indigo-600"><?= (int)$row['med_count'] ?> active</span></span>
                     </div>
                 </div>
                 <div class="px-6 pb-5 flex gap-2">
@@ -106,7 +113,8 @@ try {
                         class="flex-1 text-center bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium py-2 rounded-lg transition">
                         View Meds
                     </a>
-                    <a href="cancelreg.php?doc=1"
+                    <a href="cancelreg.php?id=<?= $row['id'] ?>"
+                        onclick="return confirm('Cancel registration with this doctor? This will also remove all their prescriptions.')"
                         class="flex-1 text-center bg-red-100 hover:bg-red-200 text-red-600 text-sm font-medium py-2 rounded-lg transition">
                         Cancel
                     </a>

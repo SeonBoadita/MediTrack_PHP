@@ -3,19 +3,23 @@ session_start();
 include ('connection/database.php');
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $name = $_POST['username'];
+    $name = mysqli_real_escape_string($conn, trim($_POST['username']));
     $email = filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL);
     $password = $_POST['password'];
 
-    $hash = password_hash($password, PASSWORD_DEFAULT);
+    if (!$email) {
+        $error = 'Invalid email address.';
+    } else {
+        $hash = password_hash($password, PASSWORD_DEFAULT);
 
-    $sql = "INSERT INTO usersignup (name, email, password) VALUES ('$name', '$email', '$hash')";
+        $sql = "INSERT INTO usersignup (name, email, password) VALUES ('$name', '$email', '$hash')";
 
-    if (mysqli_query($conn, $sql)) {
-        $_SESSION['user_id'] = mysqli_insert_id($conn);
-        $_SESSION['name'] = $name;
-        header('Location: dashboard.php');
-        exit();
+        if (mysqli_query($conn, $sql)) {
+            $_SESSION['user_id'] = mysqli_insert_id($conn);
+            $_SESSION['name'] = htmlspecialchars_decode($name);
+            header('Location: dashboard.php');
+            exit();
+        }
     }
 }
 ?>
@@ -34,11 +38,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <div class="w-full max-w-md p-8 bg-white rounded shadow-md">
             <h1 class="text-3xl font-bold mb-4">Sign Up</h1>
             <form action="<?= htmlspecialchars($_SERVER['PHP_SELF']) ?>" method="post" class="flex flex-col gap-4">
-                <input type="text" name="username" placeholder="Username" require class="border p-2 rounded">
-                <input type="email" name="email" placeholder="Email" require class="border p-2 rounded">
-                <input type="password" name="password" placeholder="Password" require class="border p-2 rounded">
+                <input type="text" name="username" placeholder="Username" required class="border p-2 rounded">
+                <input type="email" name="email" placeholder="Email" required class="border p-2 rounded">
+                <input type="password" name="password" placeholder="Password" required class="border p-2 rounded">
                 <button type="submit" class="bg-green-500 text-white p-2 rounded">Sign Up</button>
                 <p>Have an account? <a href="index.php" class="text-blue-500">Login</a></p>
+                <?php if (!empty($error)): ?>
+                    <p class="text-red-500 font-semibold"><?= htmlspecialchars($error) ?></p>
+                <?php endif; ?>
             </form>
         </div>
     </div>

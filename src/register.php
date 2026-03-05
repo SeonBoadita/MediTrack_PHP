@@ -2,11 +2,18 @@
 <?php
 include ('connection/database.php');
 session_start();
+
+if (!isset($_SESSION['user_id'])) {
+    header('Location: index.php');
+    exit();
+}
+
 try {
     if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $name = filter_input(INPUT_POST, 'name', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
         $age = filter_input(INPUT_POST, 'age', FILTER_SANITIZE_NUMBER_INT);
-        $gender = $_POST['gender'];
+        $allowed_genders = ['male', 'female', 'other'];
+        $gender = in_array($_POST['gender'], $allowed_genders) ? $_POST['gender'] : 'other';
         $disease = filter_input(INPUT_POST, 'disease', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
         $contact = filter_input(INPUT_POST, 'contact', FILTER_SANITIZE_NUMBER_INT);
         $doctor_id = filter_input(INPUT_POST, 'doctor', FILTER_SANITIZE_NUMBER_INT);
@@ -19,7 +26,7 @@ try {
         $res = mysqli_query($conn, $sql);
 
         if ($res) {
-            header("Location: home.php");
+            header("Location: doctorselect.php");
             exit();
         }
     }

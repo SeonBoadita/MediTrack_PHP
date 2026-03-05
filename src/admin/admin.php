@@ -7,6 +7,16 @@ if (empty($admin_id)) {
     header('Location: adminlogin.php');
     exit();
 }
+
+// Dynamic stats
+$total_res = mysqli_query($conn, "SELECT COUNT(*) AS total FROM user_register WHERE doctor_id = '$admin_id'");
+$total_patients = mysqli_fetch_assoc($total_res)['total'];
+
+$diag_res = mysqli_query($conn, "SELECT COUNT(DISTINCT user_disease) AS cnt FROM user_register WHERE doctor_id = '$admin_id'");
+$total_diagnoses = mysqli_fetch_assoc($diag_res)['cnt'];
+
+$meds_res = mysqli_query($conn, "SELECT COUNT(*) AS cnt FROM reg_medicins WHERE doctor_id = '$admin_id'");
+$total_meds = mysqli_fetch_assoc($meds_res)['cnt'];
 ?>
 
 <!DOCTYPE html>
@@ -25,9 +35,10 @@ if (empty($admin_id)) {
         <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
             <a href="admin.php" class="text-2xl font-bold text-indigo-600">MediTrack <span
                     class="text-sm font-normal text-gray-400"><?= $admin_name ?></span></a>
-            <div class="flex gap-4 text-sm">
+            <div class="flex gap-4 text-sm items-center">
                 <a href="admin.php"
                     class="text-indigo-600 font-semibold border-b-2 border-indigo-600 pb-1">Dashboard</a>
+                <a href="logout_admin.php" class="bg-red-100 text-red-500 hover:bg-red-200 px-3 py-1.5 rounded-lg transition font-medium">Logout</a>
             </div>
         </div>
     </nav>
@@ -44,15 +55,15 @@ if (empty($admin_id)) {
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
             <div class="bg-white rounded-2xl shadow p-5">
                 <p class="text-sm text-gray-500">Total Patients</p>
-                <p class="text-3xl font-bold text-indigo-600 mt-1">4</p>
+                <p class="text-3xl font-bold text-indigo-600 mt-1"><?= $total_patients ?></p>
             </div>
             <div class="bg-white rounded-2xl shadow p-5">
                 <p class="text-sm text-gray-500">Active Diagnoses</p>
-                <p class="text-3xl font-bold text-green-600 mt-1">4</p>
+                <p class="text-3xl font-bold text-green-600 mt-1"><?= $total_diagnoses ?></p>
             </div>
             <div class="bg-white rounded-2xl shadow p-5">
                 <p class="text-sm text-gray-500">Medicines Assigned</p>
-                <p class="text-3xl font-bold text-yellow-500 mt-1">8</p>
+                <p class="text-3xl font-bold text-yellow-500 mt-1"><?= $total_meds ?></p>
             </div>
         </div>
 
@@ -103,8 +114,9 @@ if (empty($admin_id)) {
                                             <div class="flex items-center justify-center gap-2">
                                                 <a href="addmedicins.php?id=<?= $row['id'] ?>&uid=<?=$id?>" class="bg-indigo-500 text-white text-xs px-3 py-1.5 rounded-lg hover:bg-indigo-600 transition">View Medicines</a>
                                                 
-                                                <form method="post" action="delete_patient.php">
+                                                <form method="post" action="delete_patient.php" onsubmit="return confirm('Delete this patient and all their medicines?');">
                                                     <input type="hidden" name="delete_id" value="<?= $row['id'] ?>">
+                                                    <button type="submit" class="bg-red-500 text-white text-xs px-3 py-1.5 rounded-lg hover:bg-red-600 transition">Delete</button>
                                                 </form>
                                             </div>
                                         </td>
